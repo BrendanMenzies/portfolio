@@ -1,5 +1,6 @@
 #!/bin/bash
-#curl https://haveibeenpwned.com/PwnedWebsites
+#Brendan Menzies - CYB6004 Scripting Languages Assessment 4
+
 
 # Regular Colors
 Black='\033[0;30m'        # Black
@@ -11,10 +12,17 @@ Purple='\033[0;35m'       # Purple
 Cyan='\033[0;36m'         # Cyan
 White='\033[0;37m'        # White
 
-webpage=$(cat tmp_file)
-
 #The website is saved as the variable webpage
-#webpage=$(curl https://haveibeenpwned.com/PwnedWebsites)
+webpage=$(curl https://haveibeenpwned.com/PwnedWebsites)
+
+#The following tests look at the website using the way back machine to test a different dataset. Used for testing only.
+#Test 1 - only gets company names - page design is too old.
+#webpage=$(curl https://web.archive.org/web/20170719042521/https://haveibeenpwned.com/PwnedWebsites)
+#Test 2 - works fine
+#webpage=$(curl https://web.archive.org/web/20190307045831/https://haveibeenpwned.com/PwnedWebsites)
+#Test 3 - works fine
+#webpage=$(curl https://web.archive.org/web/20191203203508/https://haveibeenpwned.com/PwnedWebsites)
+
 
 
 
@@ -67,36 +75,58 @@ numData=${#companies2[@]}
 counter=0
 
 printf "|"
-printf "${Blue}%-55s${White}" "Company:"
+printf "${Cyan}%-55s${White}" "Company:"
 printf "|"
-printf "${Blue}%-20s${White}" "Breach Date:"
+printf "${Cyan}%-20s${White}" "Breach Date:"
 printf "|"
-printf "${Blue}%-20s${White}" "Reported Date"
+printf "${Cyan}%-20s${White}" "Reported Date"
 printf "|"
-printf "${Blue}%-25s${White}" "Accounts Comprimised:"
+printf "${Cyan}%-25s${White}" "Accounts Comprimised:"
 printf "|\n"
+printf "|-------------------------------------------------------|--------------------|--------------------|-------------------------|\n"
 
 #This while loop prints out each of the variables into a table.
+#The script checks if the counter is divisible by two and applies different colouring for alternating lines.
 while [ $counter -lt $numData ]
 do
-    printf "|"
-    printf "%-55s" "${companies2[$counter]}"
-    printf "|"
-    printf "%-20s" "${breachDates2[$counter]}"
-    printf "|"
-    printf "%-20s" "${reportedDates2[$counter]}"
-    printf "|"
-    printf "%-25s" "${comprimisedAccounts2[$counter]}"
-    printf "|\n"
+    if (($counter % 2 == 0))
+    then
+        printf "|"
+        printf "${Purple}%-55s${White}" " ${companies2[$counter]}"
+        printf "|"
+        printf "${Purple}%-20s${White}" " ${breachDates2[$counter]}"
+        printf "|"
+        printf "${Purple}%-20s${White}" " ${reportedDates2[$counter]}"
+        printf "|"
+        printf "${Purple}%-25s${White}" " ${comprimisedAccounts2[$counter]}"
+        printf "|\n"
+    else
+        printf "|"
+        printf "${Blue}%-55s${White}" " ${companies2[$counter]}"
+        printf "|"
+        printf "${Blue}%-20s${White}" " ${breachDates2[$counter]}"
+        printf "|"
+        printf "${Blue}%-20s${White}" " ${reportedDates2[$counter]}"
+        printf "|"
+        printf "${Blue}%-25s${White}" " ${comprimisedAccounts2[$counter]}"
+        printf "|\n"
+    fi
+
+
     ((counter++))
 done
 
-#Debugging
+printf "|-------------------------------------------------------|--------------------|--------------------|-------------------------|\n"
 
-echo "$companies" > companies.txt
-echo "${companies2[@]}\n" > companies2.txt
-
-printf "|"
-printf "${Blue}%-55s\n${White}" "${companies2[396]}"
+if [[ ${#companies2[@]} == ${#breachDates2[@]} && ${#companies2[@]} == ${#reportedDates2[@]} && ${#companies2[@]} == ${#comprimisedAccounts2[@]}  ]]
+then
+    echo "Data columns are equal - Data is alligned correctly."
+else
+    echo "Data columns are not equal"
+    echo "Number of Companies :${#companies2[@]}"
+    echo "Number of Breach Dates: ${#breachDates2[@]}"
+    echo "Number of Reported Dates: ${#reportedDates2[@]}"
+    echo "Number of Reported Dates: ${#comprimisedAccounts2[@]}"
+fi
 
 exit 0
